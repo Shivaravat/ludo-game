@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Two Player Ludo Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .game-board {
+      position: relative;
+      margin: 30px auto;
+      width: 620px;
+      height: 80px;
+      border: 3px solid #444;
+      background-color: #fff;
+    }
+
+    .path {
+      display: flex;
+      justify-content: space-between;
+      position: absolute;
+      top: 30px;
+      left: 0;
+      right: 0;
+      padding: 0 10px;
+    }
+
+    .path::before {
+      content: "";
+      display: block;
+      height: 20px;
+      width: 100%;
+      background: repeating-linear-gradient(
+        to right,
+        #ccc,
+        #ccc 18px,
+        #eee 18px,
+        #eee 20px
+      );
+    }
+
+    .player {
+      position: absolute;
+      top: 5px;
+      font-size: 30px;
+      transition: left 0.3s ease;
+    }
+
+    #player1 {
+      left: 0;
+    }
+
+    #player2 {
+      top: 40px;
+      left: 0;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    #winner {
+      font-size: 20px;
+      color: green;
+      margin-top: 15px;
+    }
+
+    #nextBtn {
+      display: none;
+      margin-top: 20px;
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      top: -10px;
+      width: 10px;
+      height: 10px;
+      background: red;
+      z-index: 9999;
+      animation: fall 3s linear infinite;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Two Player Ludo Game</h1>
+  <div class="game-board">
+    <div id="player1" class="player">🔴</div>
+    <div id="player2" class="player">🔵</div>
+    <div class="path" id="path"></div>
+  </div>
+  <div class="controls">
+    <p>Current Turn: <span id="turn">Player 1</span></p>
+    <p>Dice: <span id="dice">-</span></p>
+    <button onclick="rollDice()">Roll Dice</button>
+    <p id="winner"></p>
+    <button id="nextBtn" onclick="resetGame()">Next Game</button>
+  </div>
+
+  <script>
+    let position1 = 0;
+    let position2 = 0;
+    let turn = 1;
+    const maxPosition = 30;
+
+    function rollDice() {
+      if (document.getElementById("winner").innerText !== "") return;
+
+      const dice = Math.floor(Math.random() * 6) + 1;
+      document.getElementById("dice").innerText = dice;
+
+      if (turn === 1) {
+        position1 += dice;
+        if (position1 >= maxPosition) {
+          position1 = maxPosition;
+          showWinner("Player 1");
+        }
+        document.getElementById("player1").style.left = (position1 * 20) + "px";
+        turn = 2;
+      } else {
+        position2 += dice;
+        if (position2 >= maxPosition) {
+          position2 = maxPosition;
+          showWinner("Player 2");
+        }
+        document.getElementById("player2").style.left = (position2 * 20) + "px";
+        turn = 1;
+      }
+
+      document.getElementById("turn").innerText = `Player ${turn}`;
+    }
+
+    function showWinner(player) {
+      document.getElementById("winner").innerText = `🎉 ${player} Wins! 🎉`;
+      document.getElementById("nextBtn").style.display = "inline-block";
+      launchConfetti();
+    }
+
+    function resetGame() {
+      position1 = 0;
+      position2 = 0;
+      turn = 1;
+      document.getElementById("player1").style.left = "0px";
+      document.getElementById("player2").style.left = "0px";
+      document.getElementById("winner").innerText = "";
+      document.getElementById("dice").innerText = "-";
+      document.getElementById("turn").innerText = "Player 1";
+      document.getElementById("nextBtn").style.display = "none";
+
+      // Remove confetti
+      document.querySelectorAll(".confetti").forEach(el => el.remove());
+    }
+
+    function launchConfetti() {
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.left = Math.random() * window.innerWidth + "px";
+        confetti.style.backgroundColor = getRandomColor();
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + "s";
+        confetti.style.width = confetti.style.height = Math.random() * 8 + 4 + "px";
+        document.body.appendChild(confetti);
+      }
+    }
+
+    function getRandomColor() {
+      const colors = ["red", "blue", "yellow", "green", "purple", "orange"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+  </script>
+</body>
+</html>
